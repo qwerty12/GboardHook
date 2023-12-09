@@ -21,17 +21,18 @@ public final class Hook implements IXposedHookLoadPackage, IXposedHookInitPackag
 
     @Override
     public void handleLoadPackage(final LoadPackageParam lpparam) throws Throwable {
-        if (lpparam == null || !lpparam.isFirstApplication || lpparam.classLoader == null || lpparam.packageName == null || !lpparam.packageName.equals(TARGET_APP))
+        if (lpparam == null || !lpparam.isFirstApplication || lpparam.classLoader == null || !TARGET_APP.equals(lpparam.packageName))
             return;
 
         if ((new File("/data/data/" + TARGET_APP + "/shared_prefs/" + FLAGS_BASENAME + ".xml")).exists())
             return;
 
         final XC_MethodHook.Unhook[] init = new XC_MethodHook.Unhook[1];
-        init[0] = findAndHookMethod("com.google.android.apps.inputmethod.libs.framework.core.LauncherActivity", lpparam.classLoader, "onCreate", android.os.Bundle.class, new XC_MethodHook() {
+        init[0] = findAndHookMethod("com.google.android.libraries.inputmethod.launcher.LauncherActivity", lpparam.classLoader, "onCreate", android.os.Bundle.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 init[0].unhook();
+                init[0] = null;
                 final Activity activity = (Activity) param.thisObject;
 
                 final Context context = activity.getApplicationContext();
@@ -63,7 +64,9 @@ public final class Hook implements IXposedHookLoadPackage, IXposedHookInitPackag
                     Thread.sleep(100);
                 }
 
-                Toast.makeText(context, "Wait a second and relaunch Gboard to complete the setup process.", Toast.LENGTH_SHORT).show();
+                try {
+                    Toast.makeText(context, "Wait a second and relaunch Gboard to complete the setup process.", Toast.LENGTH_SHORT).show();
+                } catch (Exception ignored) {}
                 activity.finishAndRemoveTask();
                 System.exit(0);
                 android.os.Process.killProcess(android.os.Process.myPid());
@@ -73,7 +76,7 @@ public final class Hook implements IXposedHookLoadPackage, IXposedHookInitPackag
 
     @Override
     public void handleInitPackageResources(XC_InitPackageResources.InitPackageResourcesParam resparam) throws Throwable {
-        if (resparam != null && resparam.packageName != null && resparam.packageName.equals(TARGET_APP)) {
+        if (resparam != null && TARGET_APP.equals(resparam.packageName)) {
             resparam.res.setReplacement(TARGET_APP, "string", "firebase_database_url", "https://sfnjhsfdjinksdfo.xcvdf");
         }
     }

@@ -17,10 +17,10 @@ No ready-built APKs; take the code, change the options you don't want and build 
 
 3. `gradlew assembleRelease`
 
-4. Get a [Gboard APK](https://www.apkmirror.com/apk/google-inc/gboard/) (not a bundle) - I used 13.4.07.559388404
+4. Get a [Gboard APK](https://www.apkmirror.com/apk/google-inc/gboard/gboard-13-6-11-574113912-release/gboard-the-google-keyboard-13-6-11-574113912-release-arm64-v8a-2-android-apk-download/) (not a bundle)
 
-5. Get LSPatch, either a [stable release](https://github.com/LSPosed/LSPatch/releases) or one built from [Git `master`](https://github.com/LSPosed/LSPatch/actions/workflows/main.yml?query=branch%3Amaster) (I used the latter FWIW)
+5. Get LSPatch, either a [stable release](https://github.com/LSPosed/LSPatch/releases) or one built from [Git `master`](https://github.com/LSPosed/LSPatch/actions/workflows/main.yml?query=branch%3Amaster)
 
-6. `java -jar jar-v0.5.1-387-release.jar --sigbypasslv 1 -m "GboardHook\app\build\outputs\apk\release\app-release-unsigned.apk" --force "%PATH_TO_GBOARD_APK%"`
+6. `java -jar lspatch.jar --sigbypasslv 1 -m "GboardHook\app\build\outputs\apk\release\app-release-unsigned.apk" --force "%PATH_TO_GBOARD_APK%"`
 
 7. `adb install -i "com.android.vending" com.google.android.inputmethod.latin*-lspatched.apk`

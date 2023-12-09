@@ -19,3 +19,11 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-repackageclasses
+-overloadaggressively
+
+-keep,allowoptimization class pk.q12.gboardhook.Hook {
+    <init>();
+    public void handleLoadPackage(de.robv.android.xposed.callbacks.XC_LoadPackage$LoadPackageParam);
+}
