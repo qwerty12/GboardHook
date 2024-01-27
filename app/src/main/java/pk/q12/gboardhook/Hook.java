@@ -24,21 +24,25 @@ public final class Hook implements IXposedHookLoadPackage, IXposedHookInitPackag
         if (lpparam == null || !lpparam.isFirstApplication || lpparam.classLoader == null || !TARGET_APP.equals(lpparam.packageName))
             return;
 
-        if ((new File("/data/data/" + TARGET_APP + "/shared_prefs/" + FLAGS_BASENAME + ".xml")).exists())
-            return;
+        /*if ((new File("/data/data/" + TARGET_APP + "/shared_prefs/" + FLAGS_BASENAME + ".xml")).exists())
+            return;*/
 
         final XC_MethodHook.Unhook[] init = new XC_MethodHook.Unhook[1];
         init[0] = findAndHookMethod("com.google.android.libraries.inputmethod.launcher.LauncherActivity", lpparam.classLoader, "onCreate", android.os.Bundle.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                init[0].unhook();
-                init[0] = null;
                 final Activity activity = (Activity) param.thisObject;
 
                 final Context context = activity.getApplicationContext();
-                SharedPreferences sharedPreferences = context.getSharedPreferences(FLAGS_BASENAME, 0);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
+                final SharedPreferences sharedPreferences = context.getSharedPreferences(FLAGS_BASENAME, 0);
 
+                if (!sharedPreferences.getBoolean("enable_tablet_large", true)) {
+                    init[0].unhook();
+                    init[0] = null;
+                    return;
+                }
+
+                final SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putBoolean("enable_tablet_large", false);
                 editor.putBoolean("enable_sharing", false);
                 editor.putBoolean("enable_email_provider_completion", true);
@@ -66,7 +70,7 @@ public final class Hook implements IXposedHookLoadPackage, IXposedHookInitPackag
 
                 try {
                     Toast.makeText(context, "Wait a second and relaunch Gboard to complete the setup process.", Toast.LENGTH_SHORT).show();
-                } catch (Exception ignored) {}
+                } catch (final Exception ignored) {}
                 activity.finishAndRemoveTask();
                 System.exit(0);
                 android.os.Process.killProcess(android.os.Process.myPid());
@@ -76,8 +80,7 @@ public final class Hook implements IXposedHookLoadPackage, IXposedHookInitPackag
 
     @Override
     public void handleInitPackageResources(XC_InitPackageResources.InitPackageResourcesParam resparam) throws Throwable {
-        if (resparam != null && TARGET_APP.equals(resparam.packageName)) {
+        if (resparam != null && TARGET_APP.equals(resparam.packageName))
             resparam.res.setReplacement(TARGET_APP, "string", "firebase_database_url", "https://sfnjhsfdjinksdfo.xcvdf");
-        }
     }
 }

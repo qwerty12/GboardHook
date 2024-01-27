@@ -13,13 +13,12 @@ android {
         targetSdk 33
         versionCode 1
         versionName "1.0"
-        resConfigs "en"
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        resourceConfigurations += ['en']
     }
 
     buildTypes {
         release {
+            isDefault true
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
